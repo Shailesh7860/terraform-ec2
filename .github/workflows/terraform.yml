@@ -8,7 +8,6 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    environment: AWS
     
     steps:
     - name: Checkout Code
