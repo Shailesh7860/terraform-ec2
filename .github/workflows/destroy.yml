@@ -6,6 +6,7 @@ on:
 jobs:
   destroy:
     runs-on: ubuntu-latest
+    environment: AWS
 
     steps:
     - name: Checkout Code
