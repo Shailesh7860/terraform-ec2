@@ -1,0 +1,17 @@
+curl -fsSL https://floci.io/install.sh | sh
+
+eval $(floci env)
+
+floci start
+
+docker rm -f floci
+
+docker network create floci-net
+
+docker run -d --name floci --network floci-net -p 4566:4566 floci/floci:latest
+
+docker run -d --name floci-ui --network floci-net -p 4500:4500 -e FLOCI_ENDPOINT=https://studious-space-yodel-wqx6vrrxwpfgpwx-4566.app.github.dev/ floci/floci-ui:latest
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
