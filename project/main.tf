@@ -24,7 +24,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true         # Turns on the AWS internal DNS resolution server
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-vpc"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true                     # Automatically gives instances a public IP
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-public-subnet"
   }
 }
 
@@ -52,10 +52,11 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false                    # Guarantees instances remain completely hidden
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-private-subnet"
   }
-
-  # =====================================================================
+}
+  
+# =====================================================================
 # BLOCK 4: THE EDGE GATEWAYS (Internet & NAT)
 # =====================================================================
 
@@ -64,7 +65,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id # Hooks the door directly onto your VPC container
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-igw"
   }
 }
 
@@ -74,7 +75,7 @@ resource "aws_eip" "nat_eip" {
   depends_on = [aws_internet_gateway.igw] # Ensures the IGW is active before requesting an IP
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-nat-eip"
   }
 }
 
@@ -85,7 +86,7 @@ resource "aws_nat_gateway" "nat" {
   depends_on    = [aws_internet_gateway.igw] # Prevents creation loops by waiting for internet pathways
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-nat"
   }
 }
 # =====================================================================
@@ -98,11 +99,11 @@ resource "aws_route_table" "public_rt" {
 
   route {
     cidr_block = "0.0.0.0/0"               # Represents absolutely any address on the internet
-    gateway_id = aws_internet_gateway.igw; # Directs internet traffic straight to the front door
+    gateway_id = aws_internet_gateway.igw.id # Directs internet traffic straight to the front door
   }
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-public-rt"
   }
 }
 
@@ -118,11 +119,11 @@ resource "aws_route_table" "private_rt" {
 
   route {
     cidr_block     = "0.0.0.0/0"           # Represents absolutely any address on the internet
-    nat_gateway_id = aws_nat_gateway.nat;  # Directs internet traffic to your one-way NAT window
+    nat_gateway_id = aws_nat_gateway.nat.id  # Directs internet traffic to your one-way NAT window
   }
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-private-rt"
   }
 }
 
@@ -159,7 +160,7 @@ resource "aws_security_group" "public_sg" {
   }
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-public-sg"
   }
 }
 
@@ -186,7 +187,7 @@ resource "aws_security_group" "private_sg" {
   }
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-private-sg"
   }
 }
 
@@ -223,7 +224,7 @@ resource "aws_instance" "public_bastion" {
   key_name               = aws_key_pair.deployer_key.key_name
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-public-ec2"
   }
 }
 
@@ -236,7 +237,7 @@ resource "aws_instance" "private_app" {
   key_name               = aws_key_pair.deployer_key.key_name
 
   tags = {
-    Name = var.tags_name
+    Name = "${var.tags_name}-private-ec2"
   }
 }
 
