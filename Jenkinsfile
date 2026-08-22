@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        // This must exactly match the Name you gave the tool in Step 2
+        terraform 'terraform-1.5'
+    }
+
     options {
         // Essential for infrastructure stability to prevent race conditions
         disableConcurrentBuilds()
