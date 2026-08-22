@@ -1,0 +1,9 @@
+# AWS Credentials and Configurations (If accidentally placed in project)
+.aws/
+credentials
+config
+
+# Environment variables containing AWS secrets
+.env
+.env.local
+.env.*.local
