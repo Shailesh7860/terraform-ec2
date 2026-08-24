@@ -1,4 +1,3 @@
-# Working Locally Commit
 # AWS Credentials and Configurations (If accidentally placed in project)
 .aws/
 credentials
