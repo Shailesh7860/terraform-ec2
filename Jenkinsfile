@@ -22,16 +22,16 @@ pipeline {
         // Jenkins credentials ID for AWS (Configured in Manage Jenkins)
         AWS_CREDS_ID       = 'Tony'
         // Secure local storage directory on the master server outside the public workspace
-        MASTER_STATE_STORE = "/var/jenkins_home/terraform_secure_store/${env.JOB_NAME}"
+        //MASTER_STATE_STORE = "/var/jenkins_home/terraform_secure_store/${env.JOB_NAME}"
     }
 
-    stages {
-        stage('Prepare Directories') {
-            steps {
-                // Ensure the secure master state directory exists on the host machine
-                sh "mkdir -p ${env.MASTER_STATE_STORE}"
-            }
-        }
+   // stages {
+   //     stage('Prepare Directories') {
+   //         steps {
+   //             // Ensure the secure master state directory exists on the host machine
+   //             sh "mkdir -p ${env.MASTER_STATE_STORE}"
+   //         }
+   //     }
 
         stage('Checkout') {
             steps {
@@ -42,21 +42,21 @@ pipeline {
             }
         }
 
-        stage('Restore Master State') {
-            steps {
-                dir(env.TF_DIR) {
-                    script {
-                        // Copy state files from the secure master backup directory into the workspace
-                        if (sh(script: "ls ${env.MASTER_STATE_STORE}/terraform.tfstate", returnStatus: true) == 0) {
-                            echo "Found existing state file on Master server. Restoring..."
-                            sh "cp ${env.MASTER_STATE_STORE}/terraform.tfstate* ."
-                        } else {
-                            echo "No state file found on Master storage. Initialising empty infrastructure configuration."
-                        }
-                    }
-                }
-            }
-        }
+    //    stage('Restore Master State') {
+    //        steps {
+    //            dir(env.TF_DIR) {
+    //                script {
+    //                    // Copy state files from the secure master backup directory into the workspace
+    //                    if (sh(script: "ls ${env.MASTER_STATE_STORE}/terraform.tfstate", returnStatus: true) == 0) {
+    //                        echo "Found existing state file on Master server. Restoring..."
+    //                        sh "cp ${env.MASTER_STATE_STORE}/terraform.tfstate* ."
+    //                    } else {
+    //                        echo "No state file found on Master storage. Initialising empty infrastructure configuration."
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 
         stage('Terraform Init') {
             steps {
@@ -116,14 +116,14 @@ pipeline {
     post {
         always {
             // Backup the newly updated state files back into the secure master directory
-            dir(env.TF_DIR) {
-                script {
-                    if (fileExists('terraform.tfstate')) {
-                        echo "Backing up local state files to secure master directory..."
-                        sh "cp terraform.tfstate* ${env.MASTER_STATE_STORE}/"
-                    }
-                }
-            }
+            //dir(env.TF_DIR) {
+            //    script {
+            //        if (fileExists('terraform.tfstate')) {
+            //            echo "Backing up local state files to secure master directory..."
+            //            sh "cp terraform.tfstate* ${env.MASTER_STATE_STORE}/"
+            //        }
+            //    }
+            //}
             // Keep the text plans visible on the Jenkins UI interface dashboard
             archiveArtifacts artifacts: 'prod/tfplan,prod/terraform-plan.txt',
                 allowEmptyArchive: true,
