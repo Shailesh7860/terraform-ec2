@@ -25,7 +25,7 @@ pipeline {
         //MASTER_STATE_STORE = "/var/jenkins_home/terraform_secure_store/${env.JOB_NAME}"
     }
 
-   // stages {
+    stages {
    //     stage('Prepare Directories') {
    //         steps {
    //             // Ensure the secure master state directory exists on the host machine
@@ -108,6 +108,33 @@ pipeline {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        stage('Terraform Outputs') {
+            when {
+                expression {
+                    env.TF_ACTION == 'Deploy'
+                }
+            }
+
+            steps {
+                dir(env.TF_DIR) {
+                    script {
+                        env.BASTION_IP = sh(
+                            script: 'terraform output -raw bastion_public_ip',
+                            returnStdout: true
+                        ).trim()
+
+                        env.PRIVATE_IP = sh(
+                            script: 'terraform output -raw private_instance_internal_ip',
+                            returnStdout: true
+                        ).trim()
+                    }
+
+                    echo "Bastion IP: ${env.BASTION_IP}"
+                    echo "Private IP: ${env.PRIVATE_IP}"
                 }
             }
         }
